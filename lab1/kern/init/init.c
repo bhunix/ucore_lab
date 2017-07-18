@@ -8,7 +8,7 @@
 #include <clock.h>
 #include <intr.h>
 #include <pmm.h>
-#include <memlayout.h>
+#include <x86.h>
 #include <kmonitor.h>
 int kern_init(void) __attribute__((noreturn));
 void grade_backtrace(void);
@@ -85,18 +85,16 @@ lab1_print_cur_status(void) {
 static void
 lab1_switch_to_user(void) {
     //LAB1 CHALLENGE 1 : TODO
-    //asm volatile ("movw %%ax, %%eip" :: "a" (0));
-    //asm volatile ("movw %%ax, %%ss" :: "a" (USER_DS));
-    //asm volatile ("movw %%ax, %%esp" :: "a" (1000));
-    //asm volatile ("movw %%ax, %%cs" :: "a" (USER_CS));
-    //asm volatile ("ljmp %0, $1f\n 1:\n" :: "i" (USER_CS));
-    lab1_print_cur_status();
+    asm volatile ("sub $0x8, %%esp \n"
+                  "int $120 \n"
+                  "add $0x8, %%esp\n"::);
 }
 
 static void
 lab1_switch_to_kernel(void) {
     //LAB1 CHALLENGE 1 :  TODO
-    asm volatile ("int $120");
+    asm volatile ("int $121 \n"
+                  "movl %%ebp, %%esp\n"::);
 }
 
 static void
@@ -105,10 +103,8 @@ lab1_switch_test(void) {
     cprintf("+++ switch to  user  mode +++\n");
     lab1_switch_to_user();
     lab1_print_cur_status();
-#if 0
     cprintf("+++ switch to kernel mode +++\n");
     lab1_switch_to_kernel();
     lab1_print_cur_status();
-#endif
 }
 

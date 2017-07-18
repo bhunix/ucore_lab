@@ -8,8 +8,8 @@
 #include <clock.h>
 #include <intr.h>
 #include <pmm.h>
+#include <x86.h>
 #include <kmonitor.h>
-
 int kern_init(void) __attribute__((noreturn));
 void grade_backtrace(void);
 static void lab1_switch_test(void);
@@ -38,7 +38,7 @@ kern_init(void) {
 
     //LAB1: CAHLLENGE 1 If you try to do it, uncomment lab1_switch_test()
     // user/kernel mode switch test
-    //lab1_switch_test();
+    lab1_switch_test();
 
     /* do nothing */
     while (1);
@@ -85,11 +85,16 @@ lab1_print_cur_status(void) {
 static void
 lab1_switch_to_user(void) {
     //LAB1 CHALLENGE 1 : TODO
+    asm volatile ("sub $0x8, %%esp \n"
+                  "int $120 \n"
+                  "add $0x8, %%esp\n"::);
 }
 
 static void
 lab1_switch_to_kernel(void) {
     //LAB1 CHALLENGE 1 :  TODO
+    asm volatile ("int $121 \n"
+                  "movl %%ebp, %%esp\n"::);
 }
 
 static void
